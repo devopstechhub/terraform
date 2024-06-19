@@ -1,0 +1,52 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: TerraformInstaller@1
+  displayName: Installing Terraform
+  inputs:
+    terraformVersion: 'latest'
+
+- task: TerraformTaskV4@4
+  displayName: Terraform init
+  inputs:
+    provider: 'aws'
+    command: 'init'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/exercise1'
+    backendServiceAWS: 'Terraform-June'
+    backendAWSBucketName: 'terraformpracticejunebatch'
+    backendAWSKey: 'tf/terraform.tfstate'
+
+
+- task: TerraformTaskV4@4
+  displayName: Terraform Validate
+  inputs:
+    provider: 'aws'
+    command: 'validate'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/exercise1'
+    backendServiceAWS: 'Terraform-June'
+    backendAWSBucketName: 'terraformpracticejunebatch'
+    backendAWSKey: 'tf/terraform.tfstate'
+
+- task: TerraformTaskV4@4
+  displayName: Terraform apply
+  inputs:
+    provider: aws
+    command: apply
+    workingDirectory: exercise1
+    environmentServiceNameAWS: 'Terraform-June'
+    backendAzureRmUseEnvironmentVariablesForAuthentication: false
+    backendAzureRmUseEntraIdForAuthentication: false
+    backendServiceAWS: 'Terraform-June'
+    backendAWSBucketName: terraformpracticejunebatch
+    backendAWSKey: tf/terraform.tfstate
+
